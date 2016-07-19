@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using SharpPcap.LibPcap;
+﻿using PacketDotNet;
 using SharpPcap;
-using System.Threading;
+using SharpPcap.LibPcap;
+using System;
+using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Text.RegularExpressions;
-using PacketDotNet;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace ARPSCanning
 {
