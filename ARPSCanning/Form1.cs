@@ -156,7 +156,7 @@ namespace ARPSCanning
 
         private void lview_name_Click(object sender, EventArgs e)
         {
-            if (lview_name.SelectedItems == null)
+            if (lview_name.SelectedItems[0] == null)
             {
                 return;
             }
@@ -179,6 +179,7 @@ namespace ARPSCanning
         {
             // 공격ㄱㄱ
             var device = LibPcapLiveDeviceList.Instance[1];
+            device.Open(DeviceMode.Promiscuous, 1000);
             IPAddress dst_ip = null;
             IPAddress src_ip = null;
             PhysicalAddress dst_mac = null;
