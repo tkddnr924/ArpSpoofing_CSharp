@@ -64,6 +64,7 @@ namespace ARPSCanning
         {
             flag = true;
             LibPcapLiveDevice device = (LibPcapLiveDevice)dev;
+            ARP arp = new ARP(device);
             string ip;
             for (int i= 0;i<20;i++)
             {
@@ -77,8 +78,12 @@ namespace ARPSCanning
                 }
                 ip += i;
                 string result = ScanHost(ip, device);
-                if (result != "fail")
-                    UpdateList(ip, result);
+                device.Open(DeviceMode.Promiscuous, 50);
+                if (arp.Resolve(IPAddress.Parse(ip)) != null)
+                {
+                    if (result != "fail")
+                        UpdateList(ip, result);
+                }
             }
             MessageBox.Show("완료");
             flag = false;
@@ -87,7 +92,6 @@ namespace ARPSCanning
         private string ScanHost(string ip, LibPcapLiveDevice device)
         {
             IPAddress t_ip = null;
-            int delay = 1200000;
             bool pos = IPAddress.TryParse(ip, out t_ip);
             if (!pos)
             {
@@ -95,8 +99,8 @@ namespace ARPSCanning
                 return "fail";
             }
             ARP arp = new ARP(device);
-            arp.Timeout = new TimeSpan(delay);
-
+            // arp.Timeout = new TimeSpan(delay);
+            device.Open(DeviceMode.Promiscuous, 200);
             var re_mac = arp.Resolve(t_ip);
             if (re_mac == null)
             {
@@ -177,21 +181,18 @@ namespace ARPSCanning
         private void button2_Click(object sender, EventArgs e)
         {
             var device = LibPcapLiveDeviceList.Instance[1];
-            device.Open(DeviceMode.Promiscuous, 1000);
-            IPAddress dst_ip = null;
-            IPAddress src_ip = null;
-            PhysicalAddress dst_mac = null;
-            PhysicalAddress src_mac = null;
+            device.Open(DeviceMode.Promiscuous, 200);
+            IPAddress dst_ip = null;        // 타깃 ip
+            IPAddress src_ip = null;        // Gateway ip
+            PhysicalAddress dst_mac = null; // 타깃 mac
+            PhysicalAddress src_mac = null; // 나의 mac
 
             dst_ip = IPAddress.Parse(tbox_ip.Text);
             dst_mac = PhysicalAddress.Parse(tbox_mac.Text.Replace(':', '-'));
             src_ip = IPAddress.Parse("192.168.0.1");
             src_mac = NetworkInterface.GetAllNetworkInterfaces()[1].GetPhysicalAddress();
-
-            ARPPacket arp = new ARPPacket(ARPOperation.Response, dst_mac, dst_ip, src_mac, src_ip);
-            EthernetPacket epacket = new EthernetPacket(src_mac, dst_mac, EthernetPacketType.Arp);
-            MessageBox.Show("Hardware len:" + arp.HardwareAddressType);
-            MessageBox.Show("prot len:" + arp.ProtocolAddressType);
+            EthernetPacket epacket = new EthernetPacket(device.MacAddress, dst_mac, EthernetPacketType.Arp);
+            ARPPacket arp = new ARPPacket(ARPOperation.Response, dst_mac, dst_ip,device.MacAddress, src_ip);
             epacket.PayloadPacket = arp;
             device.SendPacket(epacket);
             device.Close();
