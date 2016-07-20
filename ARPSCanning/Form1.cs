@@ -192,6 +192,8 @@ namespace ARPSCanning
 
             ARPPacket arp = new ARPPacket(ARPOperation.Response, dst_mac, dst_ip, src_mac, src_ip);
             EthernetPacket epacket = new EthernetPacket(src_mac, dst_mac, EthernetPacketType.Arp);
+            MessageBox.Show("Hardware len:" + arp.HardwareAddressType);
+            MessageBox.Show("prot len:" + arp.ProtocolAddressType);
             epacket.PayloadPacket = arp;
             device.SendPacket(epacket);
             device.Close();
