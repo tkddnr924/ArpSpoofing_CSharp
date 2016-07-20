@@ -186,12 +186,14 @@ namespace ARPSCanning
             PhysicalAddress dst_mac = null; // 타깃 mac
             PhysicalAddress src_mac = null; // 나의 mac
             var card = NetworkInterface.GetAllNetworkInterfaces()[1].GetIPProperties().GatewayAddresses;
+
             dst_ip = IPAddress.Parse(tbox_ip.Text);
             dst_mac = PhysicalAddress.Parse(tbox_mac.Text.Replace(':', '-'));
             src_ip = card.First().Address;
             src_mac = NetworkInterface.GetAllNetworkInterfaces()[1].GetPhysicalAddress();
+
             EthernetPacket epacket = new EthernetPacket(device.MacAddress, dst_mac, EthernetPacketType.Arp);
-            ARPPacket arp = new ARPPacket(ARPOperation.DRARPReply, dst_mac, dst_ip,device.MacAddress, src_ip);
+            ARPPacket arp = new ARPPacket(ARPOperation.Response, dst_mac, dst_ip,device.MacAddress, src_ip);
             epacket.PayloadPacket = arp;
             device.SendPacket(epacket);
             device.Close();
