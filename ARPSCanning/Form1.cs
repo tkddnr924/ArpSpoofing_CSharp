@@ -66,7 +66,7 @@ namespace ARPSCanning
             LibPcapLiveDevice device = (LibPcapLiveDevice)dev;
             ARP arp = new ARP(device);
             string ip;
-            for (int i= 0;i<20;i++)
+            for (int i= 0;i<255;i++)
             {
                 if (ip_addr.Length == 0)
                 {
@@ -181,10 +181,10 @@ namespace ARPSCanning
         {
             var device = LibPcapLiveDeviceList.Instance[1];
             device.Open(DeviceMode.Promiscuous, 200);
-            IPAddress dst_ip = null;        // 타깃 ip
-            IPAddress src_ip = null;        // Gateway ip
-            PhysicalAddress dst_mac = null; // 타깃 mac
-            PhysicalAddress src_mac = null; // 나의 mac
+            IPAddress dst_ip = null;                    // 타깃 ip
+            IPAddress src_ip = null;                    // Gateway ip
+            PhysicalAddress dst_mac = null;             // 타깃 mac
+            PhysicalAddress src_mac = null;             // 나의 mac
             var card = NetworkInterface.GetAllNetworkInterfaces()[1].GetIPProperties().GatewayAddresses;
 
             dst_ip = IPAddress.Parse(tbox_ip.Text);
