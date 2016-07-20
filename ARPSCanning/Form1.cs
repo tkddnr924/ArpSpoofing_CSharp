@@ -50,9 +50,7 @@ namespace ARPSCanning
             {
                 return;
             }
-            int r_timeout = 1000;
             ICaptureDevice device = CaptureDeviceList.Instance[index];
-            device.Open(DeviceMode.Promiscuous, r_timeout);
 
             thread = new Thread(() => ScanNetwork(device, ip_addr));
             thread.Start();
