@@ -185,12 +185,11 @@ namespace ARPSCanning
             IPAddress src_ip = null;                    // Gateway ip
             PhysicalAddress dst_mac = null;             // 타깃 mac
             PhysicalAddress src_mac = null;             // 나의 mac
-            var card = NetworkInterface.GetAllNetworkInterfaces()[2].GetIPProperties().GatewayAddresses;
-
+            
             dst_ip = IPAddress.Parse(tbox_ip.Text);
             dst_mac = PhysicalAddress.Parse(tbox_mac.Text.Replace(':', '-'));
-            src_ip = card.First().Address;
-            src_mac = NetworkInterface.GetAllNetworkInterfaces()[2].GetPhysicalAddress();
+            src_ip = device.Interface.GatewayAddress;
+            src_mac = device.MacAddress;
 
             EthernetPacket epacket = new EthernetPacket(device.MacAddress, dst_mac, EthernetPacketType.Arp);
             ARPPacket arp = new ARPPacket(ARPOperation.Response, dst_mac, dst_ip,device.MacAddress, src_ip);
